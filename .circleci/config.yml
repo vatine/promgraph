@@ -18,6 +18,9 @@ jobs:
           paths:
             - "/go/pkg/mod"
       - run:
+          name: check go format
+          command: find . -type f -name '*.go' -print | xargs gofmt -d | awk '{print} END { exit (NR > 0) }'
+      - run:
           name: Run tests
           command: |
             mkdir -p /tmp/test-reports
