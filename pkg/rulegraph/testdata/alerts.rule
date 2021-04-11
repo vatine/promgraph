@@ -1,0 +1,8 @@
+groups:
+  - name: alertgroup
+    rules:
+      - alert: TestAlert
+        expr: avg_over_time(test:rule:sum[1h]) < 0.9
+        annotations:
+          summary: summary
+          description: description

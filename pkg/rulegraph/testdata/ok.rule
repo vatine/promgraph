@@ -1,0 +1,5 @@
+groups:
+  - name: test
+    rules:
+      - record: test:rule:sum
+        expr: sum(up)
