@@ -1,4 +1,4 @@
-// Copyright 2017 The Prometheus Authors
+// Copyright 2021 Ingvar Mattsson
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -27,6 +27,7 @@ type ruleType uint8
 const (
 	recorded ruleType = 0
 	alert    ruleType = 1
+	unknown  ruleType = 2
 )
 
 // Custom error type
@@ -123,6 +124,9 @@ func (g *Graph) getEdges(r rulefmt.RuleNode) {
 	for _, next := range g.nexts {
 		edge := buildEdge(from, next)
 		g.edges[edge] = true
+		if _, ok := g.nodes[next]; !ok {
+			g.nodes[next] = unknown
+		}
 	}
 }
 
@@ -181,6 +185,8 @@ func EmitGraph(g *Graph, w io.Writer) {
 			fmt.Fprintf(w, "  %s [shape=oval]\n", name)
 		case t == alert:
 			fmt.Fprintf(w, "  %s [shape=doubleoctagon]", name)
+		case t == unknown:
+			fmt.Fprintf(w, "  %s [shape=rect]\n", name)
 		default:
 			fmt.Fprintf(w, "  /* Unknown node type %v for %s */\n", t, name)
 		}
