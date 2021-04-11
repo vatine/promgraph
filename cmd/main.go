@@ -45,9 +45,9 @@ func files(in []string) []string {
 
 // Return a sink for the graph, and a bool indicating if it needs to
 // be closed.
-func output(designator string) (io.Writer, bool) {
-	if output == "-" {
-		return os.Stdout, false
+func output(designator string) io.Writer {
+	if designator == "-" {
+		return os.Stdout
 	}
 
 	f, err := os.Open(designator)
@@ -58,20 +58,21 @@ func output(designator string) (io.Writer, bool) {
 		}).Fatal("Failed to open output file.")
 	}
 
-	return f, true
+	return f
 }
 
 func main() {
 	out := flag.String("output", "-", "Output file (use '-' for stdout).")
 	flag.Parse()
 
-	filenames := files(flag.Args)
-	sink, close := output(*out)
-	if close {
-		defer sink.Close()
+	filenames := files(flag.Args())
+	sink := output(*out)
+
+	if closer, ok := sink.(io.WriteCloser); ok {
+		defer closer.Close()
 	}
 
-	rules, err := rulegraph.LoadRuleFiles(filenames)
+	rules, err := rulegraph.LoadRuleFiles(filenames...)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
