@@ -175,14 +175,14 @@ func TestBuildRuleDiagram(t *testing.T) {
 			[]string{"test:rule:sum"},
 			[]string{},
 			[]string{"up"},
-			[]string{"test:rule:sum -> up"},
+			[]string{"\"test:rule:sum\" -> up"},
 		},
 		{
 			[]string{"testdata/ok.rule", "testdata/alerts.rule"},
 			[]string{"test:rule:sum"},
 			[]string{"TestAlert"},
 			[]string{"up"},
-			[]string{"test:rule:sum -> up", "TestAlert -> test:rule:sum"},
+			[]string{"\"test:rule:sum\" -> up", "TestAlert -> \"test:rule:sum\""},
 		},
 	}
 
