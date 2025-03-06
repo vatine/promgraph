@@ -76,7 +76,7 @@ func newGraph() *Graph {
 	return rv
 }
 
-// Methid implementing the promql parser Visitor interface.
+// Method implementing the promql parser Visitor interface.
 func (g *Graph) Visit(node parser.Node, path []parser.Node) (parser.Visitor, error) {
 	if node == nil && path == nil {
 		return nil, nil
@@ -107,6 +107,14 @@ func (g *Graph) Visit(node parser.Node, path []parser.Node) (parser.Visitor, err
 
 // Contruct a string representing the edge from one node to another.
 func buildEdge(from, to string) string {
+	if strings.Contains(from, ":") {
+		from = fmt.Sprintf("\"%s\"", from)
+	}
+
+	if strings.Contains(to, ":") {
+		to = fmt.Sprintf("\"%s\"", to)
+	}
+
 	return fmt.Sprintf("%s -> %s", from, to)
 }
 
@@ -180,11 +188,14 @@ func BuildRuleDiagram(groups []rulefmt.RuleGroup) *Graph {
 func EmitGraph(g *Graph, w io.Writer) {
 	fmt.Fprintf(w, "digraph {\n")
 	for name, t := range g.nodes {
+		if strings.Contains(name, ":") {
+			name = fmt.Sprintf("\"%s\"", name)
+		}
 		switch {
 		case t == recorded:
 			fmt.Fprintf(w, "  %s [shape=oval]\n", name)
 		case t == alert:
-			fmt.Fprintf(w, "  %s [shape=doubleoctagon]", name)
+			fmt.Fprintf(w, "  %s [shape=doubleoctagon]\n", name)
 		case t == unknown:
 			fmt.Fprintf(w, "  %s [shape=rect]\n", name)
 		default:
